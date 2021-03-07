@@ -28,7 +28,7 @@ exports.run = async (client, message, args, level) => {
                         id: key,
                         name: textChannels[key]
                     });
-                    await message.reply(` successfully added **${inputChannelName}** for **${message.guild.name}**.`)
+                    await message.reply(` successfully added **${inputChannelName}** for the **${message.guild.name}** Discord server.`)
                 }
             }
         } else {
