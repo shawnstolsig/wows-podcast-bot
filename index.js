@@ -11,9 +11,6 @@ const readdir = promisify(require("fs").readdir);
 const Enmap = require("enmap");
 const config = require("./config.js");
 
-// This is your client. Some people call it `bot`, some people call it `self`,
-// some might call it `cootchie`. Either way, when you see `client.something`,
-// or `bot.something`, this is what we're referring to. Your client.
 const client = new Discord.Client({
   ws: {
     intents: config.intents
@@ -36,18 +33,15 @@ require("./modules/functions.js")(client);
 // Autofilled by the Ready event by polling the Bot Application.
 client.owners = [];
 
-// Aliases and commands are put in collections where they can be read from,
-// catalogued, listed, etc.
+// Commands/aliases loaded each time the bot boots
 client.commands = new Enmap();
 client.aliases = new Enmap();
 
-// Now we integrate the use of Evie's awesome EnMap module, which
-// essentially saves a collection to disk. This is great for per-server configs,
-// and makes things extremely easy for this purpose.
+// Persistent guild settings
 client.settings = new Enmap({name: "settings"});
 
-// We're doing real fancy node 8 async/await stuff here, and to do that
-// we need to wrap stuff in an anonymous function. It's annoying but it works.
+// Persistent Guild channels for posting messages
+client.broadcastChannels = new Enmap({name: "broadcastChannels"});
 
 const init = async () => {
 
