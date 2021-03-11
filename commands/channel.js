@@ -18,19 +18,21 @@ exports.run = async (client, message, args, level) => {
 
     // iterate through input channel names
     for (const inputChannelName of args) {
+
         // verify user input valid channel name
         if(Object.values(textChannels).includes(inputChannelName)){
-            // find the correct channel
-            for(const key in textChannels){
-                if(textChannels[key] === inputChannelName){
-                    // store channel in broadcast channel as object containing both name and id
-                    client.broadcastChannels.set(message.guild.id, {
-                        id: key,
-                        name: textChannels[key]
-                    });
-                    await message.reply(` successfully added **${inputChannelName}** for the **${message.guild.name}** Discord server.`)
-                }
-            }
+
+            // store channel info into enmap
+            const channelId = Object.keys(textChannels).find(key => textChannels[key] === inputChannelName);
+            client.broadcastChannels.set(message.guild.id.toString(), {
+                guildId: message.guild.id,
+                guildName: message.guild.name,
+                channelName: inputChannelName,
+                channelId,
+            })
+
+            await message.reply(` successfully added **${inputChannelName}** for the **${message.guild.name}** Discord server.`)
+
         } else {
             await message.reply(` invalid channel name.`)
         }
