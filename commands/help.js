@@ -18,7 +18,8 @@ exports.run = (client, message, args, level) => {
     const longest = commandNames.reduce((long, str) => Math.max(long, str.length), 0);
 
     let currentCategory = "";
-    let output = `= Command List =\n\n[Use ${message.settings.prefix}help <commandname> for details]\n`;
+    let output = `= Basic Help =\nTo setup this bot, please run command:\n\n${message.settings.prefix}channel #####\n\n...where ##### is the name of the text channel where you want to receive new episode announcements.  That's it!  Currently, the bot will only send announcements on one channel per Discord.  Feel free to re-run this command if you want to update your announcement channel.  If you no longer wish to receive announcements from the podcast, simply kick the bot from the Discord server. \n\n\n`;
+    output += `= Advanced Help =\n\n[Use ${message.settings.prefix}help <commandname> for details]\n`;
     const sorted = myCommands.array().sort((p, c) => p.help.category > c.help.category ? 1 :  p.help.name > c.help.name && p.help.category === c.help.category ? 1 : -1 );
     sorted.forEach( c => {
       const cat = c.help.category.toProperCase();
