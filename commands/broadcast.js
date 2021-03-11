@@ -20,45 +20,45 @@ exports.run = async (client, message, args, level) => {
 
     const filter = response => response;
 
-    // await message.channel.send(prompts[0]);
-    // const collectedEpisodeTitle = await message.channel.awaitMessages(filter, {max: 1, time: 30000, errors: ['time']});
-    // episodeTitle = collectedEpisodeTitle.first().content;
-    // if(aborts.includes(episodeTitle)) {
-    //     await message.channel.send('Aborting.')
-    //     return
-    // }
-    //
-    // await message.channel.send(prompts[1]);
-    // const collectedEpisodeDescription = await message.channel.awaitMessages(filter, {max: 1, time: 30000, errors: ['time']});
-    // episodeDescription = collectedEpisodeDescription.first().content;
-    // if(aborts.includes(episodeDescription)) {
-    //     await message.channel.send('Aborting.')
-    //     return
-    // }
-    //
-    // await message.channel.send(prompts[2]);
-    // const collectedYoutubeLink = await message.channel.awaitMessages(filter, {max: 1, time: 30000, errors: ['time']});
-    // youtubeLink = collectedYoutubeLink.first().content;
-    // if(aborts.includes(youtubeLink)) {
-    //     await message.channel.send('Aborting.')
-    //     return
-    // }
-    // if(youtubeLink.slice(0,4) !== 'http') {
-    //     await message.channel.send(`Please use full URL, including "http".  Aborting.`)
-    //     return
-    // }
-    //
-    // await message.channel.send(prompts[3]);
-    // const collectedAnchorLink = await message.channel.awaitMessages(filter, {max: 1, time: 30000, errors: ['time']});
-    // anchorLink = collectedAnchorLink.first().content;
-    // if(aborts.includes(anchorLink)) {
-    //     await message.channel.send('Aborting.')
-    //     return
-    // }
-    // if(anchorLink.slice(0,4) !== 'http') {
-    //     await message.channel.send(`Please use full URL, including "http".  Aborting.`)
-    //     return
-    // }
+    await message.channel.send(prompts[0]);
+    const collectedEpisodeTitle = await message.channel.awaitMessages(filter, {max: 1, time: 30000, errors: ['time']});
+    episodeTitle = collectedEpisodeTitle.first().content;
+    if(aborts.includes(episodeTitle)) {
+        await message.channel.send('Aborting.')
+        return
+    }
+
+    await message.channel.send(prompts[1]);
+    const collectedEpisodeDescription = await message.channel.awaitMessages(filter, {max: 1, time: 30000, errors: ['time']});
+    episodeDescription = collectedEpisodeDescription.first().content;
+    if(aborts.includes(episodeDescription)) {
+        await message.channel.send('Aborting.')
+        return
+    }
+
+    await message.channel.send(prompts[2]);
+    const collectedYoutubeLink = await message.channel.awaitMessages(filter, {max: 1, time: 30000, errors: ['time']});
+    youtubeLink = collectedYoutubeLink.first().content;
+    if(aborts.includes(youtubeLink)) {
+        await message.channel.send('Aborting.')
+        return
+    }
+    if(youtubeLink.slice(0,4) !== 'http') {
+        await message.channel.send(`Please use full URL, including "http".  Aborting.`)
+        return
+    }
+
+    await message.channel.send(prompts[3]);
+    const collectedAnchorLink = await message.channel.awaitMessages(filter, {max: 1, time: 30000, errors: ['time']});
+    anchorLink = collectedAnchorLink.first().content;
+    if(aborts.includes(anchorLink)) {
+        await message.channel.send('Aborting.')
+        return
+    }
+    if(anchorLink.slice(0,4) !== 'http') {
+        await message.channel.send(`Please use full URL, including "http".  Aborting.`)
+        return
+    }
 
     const exampleEmbed = {
         color: 'c60003',
@@ -100,20 +100,17 @@ exports.run = async (client, message, args, level) => {
 
     const sentMessage = await message.channel.send('Sending...');
 
-    // todo: what happens when the bot is kicked from a discord?  should validate all of the channels before sending broadcast
+    // validate broadcast channels
     const currentGuilds = client.guilds.cache.keyArray();
-    console.log(`before sweep:`, client.broadcastChannels.array())
-    console.log(`currentGuilds`,currentGuilds)
+    const guildsToRemove = client.broadcastChannels.indexes.filter(id => !currentGuilds.includes(id));
+    guildsToRemove.forEach(guild => client.broadcastChannels.delete(guild))
 
-    client.broadcastChannels.sweep( id => !currentGuilds.includes(id));
-    console.log(`after sweep:`, client.broadcastChannels.array())
-
+    // send broadcast to validated channels
     const transmissions = client.broadcastChannels.indexes.map(async (guildId) => {
         const { channelId } = client.broadcastChannels.get(guildId);
         const channel = await client.channels.fetch(channelId);
         return channel.send({files: [logo], embed: exampleEmbed});
     });
-
     Promise.allSettled(transmissions)
         .then(() => {
             sentMessage.edit(`Successfully sent to ${client.broadcastChannels.count} Discord servers.`)
